@@ -37,13 +37,14 @@ if "x%~1" == "x/?" (
 rem Shell types
 if "x%~1" == "x-msys" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=MSYS& goto :checkparams
 if "x%~1" == "x-msys2" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=MSYS& goto :checkparams
-if "x%~1" == "x-mingw32" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=MINGW32& goto :checkparams
 if "x%~1" == "x-mingw64" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=MINGW64& goto :checkparams
 if "x%~1" == "x-ucrt64" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=UCRT64& goto :checkparams
 if "x%~1" == "x-clang64" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=CLANG64& goto :checkparams
-if "x%~1" == "x-clang32" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=CLANG32& goto :checkparams
 if "x%~1" == "x-clangarm64" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=CLANGARM64& goto :checkparams
-if "x%~1" == "x-mingw" shift& set /a msys2_shiftCounter+=1& (if exist "%WD%..\..\mingw64" (set MSYSTEM=MINGW64) else (set MSYSTEM=MINGW32))& goto :checkparams
+if "x%~1" == "x-mingw-x86_64-v3" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=MINGW-x86_64-v3& goto :checkparams
+if "x%~1" == "x-ucrt-x86_64-v3" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=UCRT-x86_64-v3& goto :checkparams
+if "x%~1" == "x-clang-x86_64-v3" shift& set /a msys2_shiftCounter+=1& set MSYSTEM=CLANG-x86_64-v3& goto :checkparams
+if "x%~1" == "x-mingw" shift& set /a msys2_shiftCounter+=1& (if exist "%WD%..\..\mingw-x86_64-v3" (set MSYSTEM=MINGW-x86_64-v3) else (set MSYSTEM=MINGW64))& goto :checkparams
 rem Console types
 if "x%~1" == "x-mintty" shift& set /a msys2_shiftCounter+=1& set MSYSCON=mintty.exe& goto :checkparams
 if "x%~1" == "x-conemu" shift& set /a msys2_shiftCounter+=1& set MSYSCON=conemu& goto :checkparams
@@ -98,10 +99,7 @@ set msys2_shiftCounter=
 set msys2_full_cmd=
 
 rem Setup proper title and icon
-if "%MSYSTEM%" == "MINGW32" (
-  set "CONTITLE=MinGW x32"
-  set "CONICON=mingw32.ico"
-) else if "%MSYSTEM%" == "MINGW64" (
+if "%MSYSTEM%" == "MINGW64" (
   set "CONTITLE=MinGW x64"
   set "CONICON=mingw64.ico"
 ) else if "%MSYSTEM%" == "UCRT64" (
@@ -110,12 +108,18 @@ if "%MSYSTEM%" == "MINGW32" (
 ) else if "%MSYSTEM%" == "CLANG64" (
   set "CONTITLE=MinGW Clang x64"
   set "CONICON=clang64.ico"
-) else if "%MSYSTEM%" == "CLANG32" (
-  set "CONTITLE=MinGW Clang x32"
-  set "CONICON=clang32.ico"
 ) else if "%MSYSTEM%" == "CLANGARM64" (
   set "CONTITLE=MinGW Clang ARM64"
   set "CONICON=clangarm64.ico"
+) else if "%MSYSTEM%" == "MINGW-x86_64-v3" (
+  set "CONTITLE=MinGW x86_64-v3"
+  set "CONICON=mingw-x86_64-v3.ico"
+) else if "%MSYSTEM%" == "UCRT-x86_64-v3" (
+  set "CONTITLE=MinGW UCRT x86_64-v3"
+  set "CONICON=ucrt-x86_64-v3.ico"
+) else if "%MSYSTEM%" == "CLANG-x86_64-v3" (
+  set "CONTITLE=MinGW Clang x86_64-v3"
+  set "CONICON=clang-x86_64-v3.ico"
 ) else (
   set "CONTITLE=MSYS2 MSYS"
   set "CONICON=msys2.ico"
@@ -206,7 +210,7 @@ echo Usage:
 echo     %~1 [options] [login shell parameters]
 echo.
 echo Options:
-echo     -mingw32 ^| -mingw64 ^| -ucrt64 ^| -clang64 ^| -msys[2]   Set shell type
+echo     -mingw64 ^| -ucrt64 ^| -clang64 ^| -mingw-x86_64-v3 ^| -ucrt-x86_64-v3 ^| -clang-x86_64-v3 ^| -msys[2]   Set shell type
 echo     -defterm ^| -mintty ^| -conemu                            Set terminal type
 echo     -here                            Use current directory as working
 echo                                      directory

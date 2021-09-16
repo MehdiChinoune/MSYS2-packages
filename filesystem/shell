@@ -8,7 +8,7 @@ if [[ -z "${1}" || "${1}" =~ ^(--help|-h)$ ]]; then tee <<done
     Copyright (C) 2016 Renato Silva
     Licensed under public domain
 
-Usage: source $(basename "${0}") mingw32|mingw64|msys
+Usage: source $(basename "${0}") mingw64|msys
 
     Switch between shells without restarting MSYS2. This is done by setting the
     MSYSTEM variable and sourcing /etc/profile. For interactive shells,
@@ -18,7 +18,7 @@ Usage: $(basename "${0}") COMMAND [ARGUMENTS]...
 
     Execute native Windows programs with better MSYS2 integration. This is done
     by using winpty to execute the Windows command prompt and commands from
-    /mingw32, /mingw64 and the Windows system32 directory, enabling them to work
+    /mingw64 and the Windows system32 directory, enabling them to work
     better under MinTTY and similar terminals.
 
 Usage: $(basename "${0}") DIRECTORY_OR_FILE...
@@ -36,12 +36,12 @@ fi
 
 # Argument validation
 
-if [[ "${BASH_SOURCE}" != "${0}" && ! "${1}" =~ ^(mingw32|mingw64|ucrt64|clang64|clang32|clangarm64|msys)$ ]]; then
+if [[ "${BASH_SOURCE}" != "${0}" && ! "${1}" =~ ^(mingw64|ucrt64|clang64|mingw-x86_64-v3|ucrt-x86_64-v3|clang-x86_64-v3|msys)$ ]]; then
     echo "Unrecognized shell type ${1}"
     return 1
 fi
 
-if [[ "${BASH_SOURCE}" = "${0}" && "${1}" =~ ^(mingw32|mingw64|ucrt64|clang64|clang32|clangarm64|msys)$ ]]; then
+if [[ "${BASH_SOURCE}" = "${0}" && "${1}" =~ ^(mingw64|ucrt64|clang64|mingw-x86_64-v3|ucrt-x86_64-v3|clang-x86_64-v3|msys)$ ]]; then
     echo "Cannot switch to ${1} shell without sourcing"
     exit 1
 fi
@@ -75,14 +75,15 @@ else
     system32="$(cygpath --windir)/system32"
     system32="${system32,,}"
     case "${command}" in
-        "${system32}"/*) winpty "${@}" || exit ;;
-        /usr/bin/cmd)    winpty "${@}" || exit ;;
-        /mingw32/*)      winpty "${@}" || exit ;;
-        /mingw64/*)      winpty "${@}" || exit ;;
-        /ucrt64/*)       winpty "${@}" || exit ;;
-        /clang64/*)      winpty "${@}" || exit ;;
-        /clang32/*)      winpty "${@}" || exit ;;
-        /clangarm64/*)   winpty "${@}" || exit ;;
+        "${system32}"/*)    winpty "${@}" || exit ;;
+        /usr/bin/cmd)       winpty "${@}" || exit ;;
+        /mingw64/*)         winpty "${@}" || exit ;;
+        /ucrt64/*)          winpty "${@}" || exit ;;
+        /clang64/*)         winpty "${@}" || exit ;;
+        /clangarm64/*)      winpty "${@}" || exit ;;
+        /mingw-x86_64-v3/*) winpty "${@}" || exit ;;
+        /ucrt-x86_64-v3/*)  winpty "${@}" || exit ;;
+        /clang-x86_64-v3/*) winpty "${@}" || exit ;;
         *)                      "${@}" || exit ;;
     esac
     exit 0
