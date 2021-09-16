@@ -12,6 +12,9 @@ jobs:
   build:
     if: ${{ github.event_name != 'push' || github.ref != 'refs/heads/master'}}
     runs-on: windows-2022
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      myrepo_url: "https://github.com/MehdiChinoune/MSYS2-packages/releases/download/msys-x86_64-v3"
 
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +38,13 @@ jobs:
         run: |
           sed -i '1s|^|[staging]\nServer = https://repo.msys2.org/staging/\nSigLevel = Never\n|' /etc/pacman.conf
 
-      - name: Update using staging
+      - name: Add myrepo
+        shell: msys2 {0}
+        run: |
+          sed -i '1s|^|[msys-x86_64-v3]\nServer = ${{ env.myrepo_url }}/\nSigLevel = Never\n|' /etc/pacman.conf
+          cat /etc/pacman.conf
+
+      - name: Update using staging/myrepo
         run: |
           msys2 -c 'pacman --noconfirm -Suuy'
           msys2 -c 'pacman --noconfirm -Suu'
@@ -61,6 +70,23 @@ jobs:
         with:
           name: sources
           path: C:/_/artifacts/*.src.tar.*
+
+      - name: Download myrepo database files
+        run: |
+          cd temp
+          gh release download msys-x86_64-v3 -p 'msys-x86_64-v3*' -D myrepo
+
+      - name: Update local database files
+        shell: msys2 {0}
+        run: |
+          repo-add temp/myrepo/msys-x86_64-v3.db.tar.gz /c/_/artifacts/*.pkg.tar.*
+          rm temp/myrepo/*.old
+
+      - name: Upload packages and database
+        shell: bash
+        run: |
+          cd temp
+          gh release upload msys-x86_64-v3 C:/_/artifacts/*.pkg.tar.* myrepo/* --clobber
 
   package-grokker:
     runs-on: ubuntu-latest
