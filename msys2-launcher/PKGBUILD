@@ -2,18 +2,18 @@
 
 _realname="msys2-launcher"
 pkgname=("${_realname}")
-pkgver=1.5
+pkgver=1.4.1
 pkgrel=1
 pkgdesc="Helper for launching MSYS2 shells"
 arch=('x86_64' 'i686')
 license=('MIT')
-backup=({mingw32,mingw64,msys2,ucrt64,clang64,clang32,clangarm64}.ini)
+backup=({mingw64,msys2,ucrt64,clang64,mingw-x86_64-v3,clang-x86_64-v3,ucrt-x86_64-v3}.ini)
 conflicts=("${_realname}-git")
 replaces=("${_realname}-git")
 depends=("mintty>=1~2.2.1")
 makedepends=('mingw-w64-cross-gcc')
-source=("https://github.com/msys2/msys2-launcher/archive/v${pkgver}.tar.gz")
-sha256sums=('bd0552417efd04e5c46c2c7009181d72fac0380e99f43d4b2633a505f147f773')
+source=("https://github.com/MehdiChinoune/msys2-launcher/archive/v${pkgver}.tar.gz")
+sha256sums=('5ade8abb5a512d1385d217262db643cde8882ec6dc4aed3ab38ade57b4f03e49')
 
 build() {
   cd "msys2-launcher-${pkgver}"
@@ -22,5 +22,5 @@ build() {
 
 package() {
   cd "msys2-launcher-${pkgver}"
-  cp {mingw32,mingw64,msys2,ucrt64,clang64,clang32,clangarm64}.{exe,ini} "${pkgdir}"
+  cp {mingw64,msys2,ucrt64,clang64,mingw-x86_64-v3,clang-x86_64-v3,ucrt-x86_64-v3}.{exe,ini} "${pkgdir}"
 }
