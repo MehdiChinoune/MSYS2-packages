@@ -1,0 +1,5 @@
+# See https://www.msys2.org/dev/mirrors
+
+## Primary
+Server = https://sourceforge.net/projects/mingw-w64-x86-64-v3/files/mingw-x86_64-v3
+Server = https://github.com/MehdiChinoune/MinGW-packages/releases/download/mingw-x86_64-v3
