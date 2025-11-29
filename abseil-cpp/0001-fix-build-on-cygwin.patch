@@ -1,0 +1,28 @@
+--- a/absl/base/internal/sysinfo.cc
++++ b/absl/base/internal/sysinfo.cc
+@@ -456,7 +456,7 @@
+ 
+ pid_t GetTID() { return static_cast<pid_t>(_lwp_self()); }
+ 
+-#elif defined(__native_client__)
++#elif defined(__native_client__) || defined(__CYGWIN__)
+ 
+ pid_t GetTID() {
+   auto* thread = pthread_self();
+--- a/absl/base/policy_checks.h
++++ b/absl/base/policy_checks.h
+@@ -34,14 +34,6 @@
+ #include <cstddef>
+ #endif
+ 
+-// -----------------------------------------------------------------------------
+-// Operating System Check
+-// -----------------------------------------------------------------------------
+-
+-#if defined(__CYGWIN__)
+-#error "Cygwin is not supported."
+-#endif
+-
+ // -----------------------------------------------------------------------------
+ // Toolchain Check
+ // -----------------------------------------------------------------------------

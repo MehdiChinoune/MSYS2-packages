@@ -1,0 +1,68 @@
+# Contributor: Mehdi Chinoune <mehdi.chinoune@hotmail.com>
+
+_realname=abseil-cpp
+pkgbase=mingw-w64-${_realname}
+pkgname="${_realname}"
+pkgver=20250814.1
+pkgrel=1
+pkgdesc="Abseil Common Libraries (C++) from Google (mingw-w64)"
+arch=('x86_64')
+url="https://abseil.io"
+msys2_repository_url="https://github.com/abseil/abseil-cpp"
+msys2_references=(
+  'archlinux: abseil-cpp'
+)
+license=('spdx:Apache-2.0')
+depends=("gcc-libs")
+makedepends=("gcc"
+             "cmake"
+             "ninja")
+source=("https://github.com/abseil/abseil-cpp/releases/download/${pkgver}/${_realname}-${pkgver}.tar.gz"
+        "0001-fix-build-on-cygwin.patch")
+sha256sums=('1692f77d1739bacf3f94337188b78583cf09bab7e420d2dc6c5605a4f86785a1'
+            'SKIP')
+
+apply_patch_with_msg() {
+  for _patch in "$@"
+  do
+    msg2 "Applying $_patch"
+    patch -Nbp1 -i "${srcdir}/$_patch"
+  done
+}
+
+prepare() {
+  cd "${_realname}-${pkgver}"
+
+  apply_patch_with_msg \
+    0001-fix-build-on-cygwin.patch
+}
+
+build() {
+  declare -a _extra_config
+  if check_option "debug" "n"; then
+    _extra_config+=("-DCMAKE_BUILD_TYPE=Release")
+  else
+    _extra_config+=("-DCMAKE_BUILD_TYPE=Debug")
+  fi
+
+  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    cmake \
+      -GNinja \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      "${_extra_config[@]}" \
+      -DBUILD_SHARED_LIBS=ON \
+      -DCMAKE_DLL_NAME_WITH_SOVERSION=ON \
+      -DABSL_PROPAGATE_CXX_STD=ON \
+      -DCMAKE_CXX_STANDARD=17 \
+      -S ${_realname}-${pkgver} \
+      -B build-${MSYSTEM}
+
+  cmake --build build-${MSYSTEM}
+}
+
+package() {
+  DESTDIR="${pkgdir}" cmake --install build-${MSYSTEM}
+
+  install -Dm644 "${srcdir}"/${_realname}-${pkgver}/LICENSE \
+    "${pkgdir}"/usr/share/licenses/${_realname}/LICENSE
+}
